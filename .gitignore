@@ -6,14 +6,18 @@ dist/
 wheels/
 *.egg-info
 
-# osx
+# OSX
 .DS_store
 
 # Virtual environments
 .env
 .venv/
 
+# ipython
+.ipynb_checkpoints/
+
 # Data directory
 data/
 
+# Output files
 *.json
