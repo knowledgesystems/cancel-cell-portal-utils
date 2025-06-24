@@ -49,7 +49,7 @@ from pydantic import (
 )
 from pydantic_core import ErrorDetails
 
-from .utils import get_files
+from scripts.utils import get_files
 
 # Ignore all warnings from anndata
 warnings.filterwarnings('ignore', module='anndata')
@@ -254,8 +254,8 @@ def main(args):
     logger.info(f"Collected {len(files)} files")
 
     # Process Files
-    all_metadata = process_files(files[0:1])
-    # all_metadata = process_files(files)
+    # all_metadata = process_files(files[0:1])
+    all_metadata = process_files(files)
 
     # Example empty/default initialized AnndataMetadata
     if args.add_invalid_data_example:

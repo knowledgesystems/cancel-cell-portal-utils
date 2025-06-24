@@ -76,7 +76,7 @@ def sum_cell_types(cell_proportions: List[CellProportion]) -> dict:
     return all_cell_types
 
 
-def process_files(files):
+def process_files(files, groups: List[str] = []):
     cell_proportions = []
     for f in files:
         adata = ad.read_h5ad(f, backed=True)
@@ -99,6 +99,28 @@ def process_files(files):
         print(all_cell_types)
         json.dump(all_cell_types, f)
 
+    # Create groups
+    groups_to_add = []
+    for g in groups:
+        current_group = [cp for cp in cell_proportions if g in str(cp.file) ]
+        print(g, current_group)
+        current_group_sum = sum_cell_types(current_group)
+        print(current_group_sum)
+        print()
+        group_cp = CellProportion(file=Path(g), cell_types=current_group_sum)
+        print(group_cp)
+        groups_to_add.append(group_cp)
+
+    def has_group_membership(path_str):
+        for g in groups:
+            if g in path_str:
+                return True
+        return False
+
+    # Filter out the groups
+    cell_proportions = [cp for cp in cell_proportions if not has_group_membership(str(cp.file))]
+
+    cell_proportions = cell_proportions + groups_to_add
 
     # Dump cell_proportions to a json file
     with open("cell_proportions.json", 'wb') as f:
@@ -109,6 +131,7 @@ def process_files(files):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="")
     parser.add_argument("--input", "-i", help="input files")
+    parser.add_argument("--groups", "-g", help="Add these cell_type counts together")
     parser.add_argument("--transform", "-t", action="store_true", help="input files")
     args = parser.parse_args()
 
@@ -143,5 +166,11 @@ if __name__ == "__main__":
 
     else:
         files = get_files(args.input, ('*.h5ad',))
-        process_files(files)
+        if args.groups:
+            with open(args.groups, 'r') as f:
+                groups = [line.strip() for line in f.readlines()]
+
+            process_files(files, groups)
+        else:
+            process_files(files)
 
