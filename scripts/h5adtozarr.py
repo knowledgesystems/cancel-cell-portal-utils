@@ -1,7 +1,6 @@
 import argparse
-from pathlib import Path
 
-import anndata as ad
+from scripts.utils import convert_h5ad_to_zarr
 
 
 if __name__ == "__main__":
@@ -11,9 +10,4 @@ if __name__ == "__main__":
     parser.add_argument("--output", "-o", help="Output zarr file")
     args = parser.parse_args()
 
-    # Read in h5ad file
-    file = Path(args.input)
-    h5ad = ad.read_h5ad(file)
-
-    # Write out zarr
-    h5ad.write_zarr(Path(f"{file.name}.output.zarr"))
+    convert_h5ad_to_zarr(args.input)
